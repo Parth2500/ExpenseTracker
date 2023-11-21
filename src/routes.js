@@ -15,7 +15,7 @@ require("dotenv").config();
  * @external mongoose
  * @see {@link https://mongoosejs.com/}
  */
- const mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
 /**
  * Express.js module for building web applications.
@@ -199,27 +199,17 @@ router.post("/transactions/self-transfer", async (req, res) => {
       );
     }
 
-    // Create a new Expense (transaction from source account)
-    const expenseTransaction = new Transaction({
+    // Create a new Self Transfer
+    const selfTransaction = new Transaction({
       amount,
       type: "self-transfer",
       sourceAccount,
-      description,
-    });
-
-    // Save the expense transaction to the database within the transaction
-    const savedExpenseTransaction = await expenseTransaction.save({ session });
-
-    // Create a new Income (transaction to destination account)
-    const incomeTransaction = new Transaction({
-      amount,
-      type: "self-transfer",
       destinationAccount,
       description,
     });
 
-    // Save the income transaction to the database within the transaction
-    const savedIncomeTransaction = await incomeTransaction.save({ session });
+    // Save the self transfer transaction to the database within the transaction
+    const savedSelfTransaction = await selfTransaction.save({ session });
 
     // Update the source account balance
     const sourceAccountObject = await BankAccount.findById(
@@ -247,8 +237,7 @@ router.post("/transactions/self-transfer", async (req, res) => {
 
     res.json({
       message: "Self-transfer completed successfully",
-      expenseTransaction: savedExpenseTransaction,
-      incomeTransaction: savedIncomeTransaction,
+      selfTransferTransaction: savedSelfTransaction,
     });
   } catch (error) {
     console.error("Error performing self-transfer:", error.message);
